@@ -45,27 +45,39 @@ class LoanHistory {
     this.transactions,
   });
 
-  int? id;
-  int? amount;
+  dynamic id; // Keep it as dynamic
+  dynamic amount; // Keep it as dynamic
   String? status;
-  int? loanPackageId;
+  dynamic loanPackageId;
   DateTime? dueDate;
-  int? userId;
+  dynamic userId;
   DateTime? createdAt;
   DateTime? updatedAt;
-  List<Transaction>? transactions;
+  List<Transaction>? transactions; // Updated to be nullable
 
-  factory LoanHistory.fromJson(Map<String, dynamic> json) => LoanHistory(
-    id: json["id"],
-    amount: json["amount"],
-    status: json["status"],
-    loanPackageId: json["loan_package_id"],
-    dueDate: json["due_date"] == null ? null : DateTime.parse(json["due_date"]),
-    userId: json["user_id"],
-    createdAt: json["created_at"] == null ? null : DateTime.parse(json["created_at"]),
-    updatedAt: json["updated_at"] == null ? null : DateTime.parse(json["updated_at"]),
-    transactions: List<Transaction>.from(json["transactions"].map((x) => Transaction.fromJson(x))),
-  );
+  factory LoanHistory.fromJson(Map<String, dynamic> json) {
+    try {
+      return LoanHistory(
+        id: json["id"] is int ? json["id"] : (json["id"] is String ? int.tryParse(json["id"]) : null),
+        amount: json["amount"] is int ? json["amount"] : (json["amount"] is String ? int.tryParse(json["amount"]) : null),
+        status: json["status"],
+        loanPackageId: json["loan_package_id"],
+        dueDate: json["due_date"] == null ? null : DateTime.parse(json["due_date"]),
+        userId: json["user_id"] is int ? json["user_id"] : (json["user_id"] is String ? int.tryParse(json["user_id"]) : null),
+        createdAt: json["created_at"] == null ? null : DateTime.parse(json["created_at"]),
+        updatedAt: json["updated_at"] == null ? null : DateTime.parse(json["updated_at"]),
+        transactions: json["transactions"] != null
+            ? List<Transaction>.from(json["transactions"].map((x) {
+          print("Transaction JSON: $x"); // Add this print statement
+          return Transaction.fromJson(x);
+        }))
+            : null,
+      );
+    } catch (e) {
+      print("Error during parsing: $e"); // Add this print statement
+      rethrow; // Rethrow the exception to propagate it up
+    }
+  }
 
   Map<String, dynamic> toJson() => {
     "id": id,
@@ -76,9 +88,12 @@ class LoanHistory {
     "user_id": userId,
     "created_at": createdAt == null ? null : createdAt?.toIso8601String(),
     "updated_at": updatedAt == null ? null : updatedAt?.toIso8601String(),
-    "transactions": List<dynamic>.from(transactions!.map((x) => x.toJson())),
+    "transactions": transactions != null
+        ? List<dynamic>.from(transactions!.map((x) => x.toJson()))
+        : null, // Serialize transactions only if it's not null
   };
 }
+
 
 class Transaction {
   Transaction({
@@ -100,22 +115,22 @@ class Transaction {
   String? description;
   String? type;
   String? status;
-  int? amount;
+  dynamic amount;
   dynamic payload;
-  int? userId;
+  dynamic userId;
   dynamic completedAt;
   DateTime? createdAt;
   DateTime? updatedAt;
 
   factory Transaction.fromJson(Map<String, dynamic> json) => Transaction(
-    id: json["id"],
+    id: json["id"] is int ? json["id"] : (json["id"] is String ? int.tryParse(json["id"]) : null),
     reference: json["reference"],
     description: json["description"],
     type: json["type"],
     status: json["status"],
-    amount: json["amount"],
+    amount: json["amount"] is int ? json["amount"] : (json["amount"] is String ? int.tryParse(json["amount"]) : null),
     payload: json["payload"],
-    userId: json["user_id"],
+    userId: json["user_id"] is int ? json["user_id"] : (json["user_id"] is String ? int.tryParse(json["user_id"]) : null),
     completedAt: json["completed_at"],
     createdAt: json["created_at"] == null ? null : DateTime.parse(json["created_at"]),
     updatedAt: json["updated_at"] == null ? null : DateTime.parse(json["updated_at"]),

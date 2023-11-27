@@ -10,7 +10,7 @@ class DioClient {
   DioClient()
       : dio = Dio(
           BaseOptions(
-            baseUrl: 'https://phincash.yutechexpress.com',
+            baseUrl: 'https://phincash.cloud',
             connectTimeout: 60000,
             receiveTimeout: 60000,
             sendTimeout: 60000,

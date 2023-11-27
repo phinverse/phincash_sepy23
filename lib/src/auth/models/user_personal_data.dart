@@ -85,7 +85,8 @@ class User {
   late final List<dynamic> loans;
 
   User.fromJson(Map<String, dynamic> json) {
-    id = json['id'];
+    //id = json['id'];
+    id = json['id'] != null ? int.tryParse(json['id'].toString()) ?? 0 : 0;
     firstName = json['first_name'];
     lastName = json['last_name'];
     middleName = json['middle_name'];
@@ -98,8 +99,14 @@ class User {
     highestEduLevel = json['highest_edu_level'];
     residentialAddress = json['residential_address'];
     dateOfBirth = json['date_of_birth'];
-    mainWalletAmount = json['main_wallet_amount'];
-    secondaryWalletAmount = json['secondary_wallet_amount'];
+    //mainWalletAmount = json['main_wallet_amount'];
+    mainWalletAmount = json['main_wallet_amount'] != null
+        ? int.tryParse(json['main_wallet_amount'].toString()) ?? 0
+        : 0;
+    //secondaryWalletAmount = json['secondary_wallet_amount'];
+    secondaryWalletAmount = json['secondary_wallet_amount'] != null
+        ? int.tryParse(json['secondary_wallet_amount'].toString()) ?? 0
+        : 0;
     secondaryWalletDueAt = json['secondary_wallet_due_at'];
     maxLoanLimit = json['max_loan_limit'];
     currentLoanId = json['current_loan_id'];

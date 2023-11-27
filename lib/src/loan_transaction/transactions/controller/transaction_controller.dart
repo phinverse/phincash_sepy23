@@ -21,6 +21,8 @@ import '../../../auth/registration/registration_model/verify_user_data_model.dar
 import '../models/transaction_history_model.dart';
 import '../transaction_views/webview_page.dart';
 
+import 'dart:convert';
+
 class TransactionController extends GetxController {
   CachedData cachedData = CachedData();
   var isUserDataUpdated = false.obs;
@@ -169,17 +171,18 @@ class TransactionController extends GetxController {
 
   loanDetailAndHistory() async {
     await getLoanHistory().then((value) async {
-      if (loanHistory!.isNotEmpty || loanHistory != []) {
-        index =
-            loanHistory?.indexWhere((element) => element.status == "disbursed");
-        if (index != null) {
+      if (loanHistory != null && loanHistory!.isNotEmpty) {
+        index = loanHistory!.indexWhere((element) => element.status == "disbursed");
+        if (index != -1) {
           repaymentID = loanHistory![index!].id;
           getLoanDetails();
         } else {
-          null;
+          // Handle the case where "disbursed" status is not found
+          debugPrint("Not Disbursed");
         }
       } else {
-        null;
+        // Handle the case where loanHistory is null or empty
+        debugPrint("loanHistory is null or empty");
       }
     });
   }
@@ -294,6 +297,46 @@ class TransactionController extends GetxController {
     update();
     try {
       await DioServices().getTransaction().then((value) {
+        void printDataTypes(dynamic data) {
+          if (data is List) {
+            print('List<dynamic>');
+            for (var item in data) {
+              printDataTypes(item); // Recursively call the function for each item in the list
+            }
+          } else {
+            print(data.runtimeType);
+          }
+        }
+
+// Define a recursive function to handle nested maps
+        void printNestedData(Map<String, dynamic> data, String prefix) {
+          data.forEach((key, value) {
+            if (value is Map<String, dynamic>) {
+              // If the value is another map, recursively call the function
+              printNestedData(value, "$prefix$key.");
+            } else if (value is String) {
+              // If the value is a string, try to parse it as JSON
+              try {
+                Map<String, dynamic> parsedJson = json.decode(value);
+                printNestedData(parsedJson, "$prefix$key.");
+              } catch (e) {
+                // It's a regular string, print it as is
+                //debugPrint("$prefix$key: $value");
+                debugPrint("$prefix");
+                debugPrint("$key:");
+                debugPrint("$value");
+               }
+
+              }
+             else {
+              // Otherwise, print the key and value
+              debugPrint("$prefix$key: $value");
+            }
+          });
+        }
+        debugPrint("=====================");
+    // Start the recursive iteration with an empty prefix
+      printNestedData(value.data, "");
         transactionHistory =
             TransactionHistoryResponse.fromJson(value.data).data;
         isFetchingTransaction = false;
@@ -320,8 +363,9 @@ class TransactionController extends GetxController {
     update();
     try {
       await DioServices().getBankAccounts().then((value) {
-     
+        printValuesAndTypes(value.data);
         bankAccounts = BankAccountModel.fromJson(value.data).data;
+        print("====================================");
         isFetchingBankAccount = false;
         update();
       });
@@ -348,6 +392,7 @@ class TransactionController extends GetxController {
       await DioServices().getLoanPackages().then((value) {
         loanPackages = AvailableLoanPackages.fromJson(value.data).data;
         isFetchingAvailableLoanOffer = false;
+        print("packages returned");
         update();
       });
     } on DioError catch (err) {
@@ -356,14 +401,38 @@ class TransactionController extends GetxController {
       update();
       final errorMessage = DioException.fromDioError(err).toString();
       error = errorMessage;
+      print(errorMessage);
       throw errorMessage;
     } catch (err) {
       isFetchingAvailableLoanOffer = false;
       isFetchingAvailableLoanOfferHasError = true;
       update();
       FlushBarHelper(Get.context!).showFlushBar(err.toString());
+      print(err.toString());
       throw err.toString();
     }
+  }
+
+  void printValuesAndTypes(Map<String, dynamic> data, [String prefix = '']) {
+    data.forEach((key, value) {
+      if (value is Map<String, dynamic>) {
+        // Recursively print inner maps
+        printValuesAndTypes(value, '$prefix$key.');
+      } else if (value is List<dynamic>) {
+        // Print list elements
+        for (int i = 0; i < value.length; i++) {
+          if (value[i] is Map<String, dynamic>) {
+            printValuesAndTypes(value[i], '$prefix$key[$i].');
+          } else {
+            // Print the key, value, and data type
+            print('$prefix$key[$i]: $value[$i] (${value[i].runtimeType})');
+          }
+        }
+      } else {
+        // Print the key, value, and data type
+        print('$prefix$key: $value (${value.runtimeType})');
+      }
+    });
   }
 
   Future<void> getLoanHistory() async {
@@ -371,9 +440,35 @@ class TransactionController extends GetxController {
     update();
     try {
       await DioServices().getLoanHistory().then((value) {
-        loanHistory = LoanHistoryModel.fromJson(value.data).data;
-        isFetchingLoanHistory = false;
-        update();
+        printValuesAndTypes(value.data); // Print the values and types recursively
+        try {
+          final loanHistoryModel = LoanHistoryModel.fromJson(value.data);
+          if (loanHistoryModel.data != null && loanHistoryModel.data!.isNotEmpty) {
+            loanHistory = loanHistoryModel.data;
+            debugPrint("=============================================");
+            debugPrint("Loan history is assignment error!");
+          } else {
+            // Handle the case where "data" is empty or null
+            // You can choose to set loanHistory to an empty list or handle it differently.
+            loanHistory = [];
+            debugPrint("=============================================");
+            debugPrint("Loan history is emoty!");
+            debugPrint("JSON Response: ${value.data}"); // Print the JSON response for debugging
+            isFetchingLoanHistory = false;
+          }
+          isFetchingLoanHistory = false;
+          update();
+        } catch (err) {
+          // Handle the error appropriately
+          debugPrint("=============================================");
+          debugPrint("Could not parse loan history");
+          debugPrint("JSON Response: ${value.data}"); // Print the JSON response for debugging
+          isFetchingLoanHistory = false;
+          isFetchingLoanHistoryHasError = true;
+          update();
+          throw err.toString();
+        }
+
       });
     } on DioError catch (err) {
       isFetchingLoanHistory = false;

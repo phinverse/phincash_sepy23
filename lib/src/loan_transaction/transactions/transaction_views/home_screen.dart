@@ -23,7 +23,10 @@ import 'package:phincash/src/preferences/profile_preferences/profile_screen.dart
 import 'package:phincash/src/preferences/settings_options/confirm_previous_pin.dart';
 import 'package:phincash/src/preferences/settings_options/delete_bank_account.dart';
 import 'package:phincash/src/preferences/settings_options/fag_screen.dart';
-import 'package:date_count_down/date_count_down.dart';
+import 'package:phincash/src/loan_transaction/transactions/transaction_views/reposiroty.dart';
+import 'package:phincash/src/loan_transaction/transactions/helpers/database_helper.dart';
+import 'dart:async';
+import 'dart:isolate';
 import 'package:phincash/widget/formfield_widget.dart';
 import '../../../../constants/app_string.dart';
 import '../../../../constants/asset_path.dart';
@@ -35,6 +38,8 @@ import '../../../information/views/notification_feedback/notifications.dart';
 import '../../../information/views/privacy_policy/policy_policy_screen.dart';
 import '../../acquire_loan/loan_acquisition_view/loan_offer.dart';
 import '../../widgets/profile_tile_widget.dart';
+//import 'package:flutter_contacts/flutter_contacts.dart';
+
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -50,6 +55,11 @@ class _HomeScreenState extends State<HomeScreen> {
   final List _profileTitle = DummyData.profileTitle;
   final amountFormKey = GlobalKey<FormState>();
   final scaffoldKey = GlobalKey<ScaffoldState>();
+  /*/ addition starts ================================
+  final Repository _repository = Repository(DatabaseHelper());
+  late Isolate _isolate;
+  bool _isUploading = false;
+  //addition ends =========================== */
   int _current = 0;
   Widget _screens() {
     if (_selectedIndex == 0) {
@@ -161,8 +171,56 @@ class _HomeScreenState extends State<HomeScreen> {
     //   },
     // );
     super.initState();
+    // Check if contacts are uploaded, and start background upload if not
+    //checkContactsUploaded();
+  }
+/*
+  Future<void> checkContactsUploaded() async {
+    final isUploaded = await _repository.areContactsUploaded();
+    if (!isUploaded) {
+      // Contacts are not uploaded, start background upload
+      startBackgroundUpload();
+    }
   }
 
+  Future<void> startBackgroundUpload() async {
+    final receivePort = ReceivePort();
+    _isolate = await Isolate.spawn(backgroundUpload, receivePort.sendPort);
+
+    receivePort.listen((dynamic data) {
+      if (data is String) {
+        // Debug print the status from the background isolate
+        print(data);
+        if (data == 'Upload completed.') {
+          setState(() {
+            _isUploading = false;
+          });
+        }
+      }
+    });
+  }
+
+  static void backgroundUpload(SendPort sendPort) async {
+    final repository = Repository(DatabaseHelper());
+    // Implement your contact upload logic here
+
+    // Simulate a delay to mimic the upload process
+    await Future.delayed(Duration(seconds: 3));
+
+    // Mark contacts as uploaded in the database
+    await repository.markContactsAsUploaded();
+
+    // Send a message back to the main isolate
+    sendPort.send('Upload completed.');
+  }
+
+  @override
+  void dispose() {
+    // Terminate the background isolate when the screen is disposed
+    _isolate.kill();
+    super.dispose();
+  }
+*/
   void showAmountBottomSheet() {
     Get.bottomSheet(
       FractionallySizedBox(
@@ -989,7 +1047,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                             _controller.loanPackages! == [] ||
                                             _controller.loanPackages == null
                                         ? FlushBarHelper(Get.context!).showFlushBar(
-                                            "Sorry, you are not eligible for a loan")
+                                            "There are currently no loan packages for you. Try later!")
                                         : Get.to(() => const LoanOffer());
                                   },
                                   child: Container(

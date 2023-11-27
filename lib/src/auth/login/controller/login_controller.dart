@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:phincash/src/auth/login/login_views/verify_otp.dart';
 import 'package:phincash/src/auth/login/models/login_model.dart';
 import 'package:phincash/src/auth/models/user_personal_data.dart';
-import 'package:phincash/src/auth/registration/registration_views/bvn.dart';
 import 'package:phincash/src/auth/registration/registration_views/collect_banks_details.dart';
 import 'package:phincash/src/auth/registration/registration_views/emergency_contact.dart';
 import 'package:phincash/src/auth/registration/registration_views/selfie_page.dart';
@@ -15,9 +14,11 @@ import '../../../../services/dio_service_config/dio_error.dart';
 import '../../../../services/dio_services/dio_services.dart';
 import '../../../../utils/helpers/flushbar_helper.dart';
 import '../../../../utils/helpers/progress_dialog_helper.dart';
-import '../../../loan_transaction/acquire_loan/loan_acquisition_view/add_card.dart';
+//import '../../../loan_transaction/acquire_loan/loan_acquisition_view/add_card.dart';
+import 'package:phincash/src/auth/registration/registration_views/card-details.dart';
 import '../../registration/registration_views/basic_information.dart';
 import '../../registration/registration_views/create_transaction_pin.dart';
+import '../../registration/registration_views/webview.dart';
 
 class LoginController extends GetxController {
   CachedData cachedData = CachedData();
@@ -96,10 +97,15 @@ class LoginController extends GetxController {
               phoneNumber: phoneNumberController.text.toString(),
               otp: otp!.toString())
           .then((value) async {
+            print("value.data");
+            print(value.data);
+            print("verified response");
         var response = LoginResponseModel.fromJson(value.data);
+            print("LoginResponseModel response");
         await cachedData
             .cacheAuthToken(token: response.data?.accessToken)
             .then((value) async {
+          print("cache Data");
           if (response.data?.user?.onboardStage == "basic_information") {
             ProgressDialogHelper().hideProgressDialog(Get.context!);
             Get.offAll(() => const BasicInformation());
@@ -114,6 +120,7 @@ class LoginController extends GetxController {
             ProgressDialogHelper().hideProgressDialog(Get.context!);
             Get.offAll(() => const EmergencyContact());
           } else if (response.data?.user?.onboardStage == "bank_information") {
+            print("Basic info");
             ProgressDialogHelper().hideProgressDialog(Get.context!);
             Get.offAll(() => const CollectUserBankDetails());
           } else if (response.data?.user?.onboardStage ==
@@ -123,20 +130,53 @@ class LoginController extends GetxController {
                   id: response.data!.user!.id!.toString(),
                 ));
           } else if (response.data?.user?.onboardStage == "card_binding") {
+            debugPrint("card_binding");
             ProgressDialogHelper().hideProgressDialog(Get.context!);
-            Get.offAll(() => const AddCardScreen());
+            try {
+              debugPrint("try");
+              final response = await DioServices()
+                  .saveCardDetails();
+
+              debugPrint("saveCardDetails");
+              final paymentUrl = response.data['link'];
+              final trx_id = response.data['trx_id'];
+
+              debugPrint("==============================");
+              debugPrint(" new details" + paymentUrl + trx_id);
+
+              // Navigate to the WebView page to complete the transaction
+              Get.offAll(() => WebViewPage(url: paymentUrl));
+            }
+            on DioError catch (err) {
+              final errorMessage = DioException.fromDioError(err).toString();
+              ProgressDialogHelper().hideProgressDialog(Get.context!);
+              FlushBarHelper(Get.context!)
+                  .showFlushBar(err.response?.data["message"] ?? errorMessage);
+              throw errorMessage;
+            } catch (err) {
+              ProgressDialogHelper().hideProgressDialog(Get.context!);
+              FlushBarHelper(Get.context!).showFlushBar(err.toString());
+              throw err.toString();
+            }
+            //Get.offAll(() => const AddCardScreen());
           } else if (response.data?.user?.onboardStage == "pin_creation") {
             ProgressDialogHelper().hideProgressDialog(Get.context!);
             Get.offAll(() => const CreatePin());
           } else if (response.data?.user?.onboardStage == "onboard_completed") {
             try {
+              print("getUserPD call");
               await getUserPersonalData();
+              print("getUserPD done");
               await cachedData.cacheLoginStatus(isLoggedIn: true);
+              print("cachedData done");
               ProgressDialogHelper().hideProgressDialog(Get.context!);
               Get.to(() => const HomeScreen());
             } catch (error) {
               FlushBarHelper(Get.context!)
                   .showFlushBar("An error occurred: $error");
+              print("error occurred");
+              print("An error occurred: $error");
+
             }
           }
         });
@@ -150,6 +190,7 @@ class LoginController extends GetxController {
     } catch (err) {
       ProgressDialogHelper().hideProgressDialog(Get.context!);
       FlushBarHelper(Get.context!).showFlushBar(err.toString());
+      print(err);
       throw err.toString();
     }
   }

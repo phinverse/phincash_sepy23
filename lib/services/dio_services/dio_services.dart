@@ -133,6 +133,7 @@ class DioServices {
     });
     final response =
         await dioNetWorkServices.post("/api/v1/validate-otp", data: postBody);
+    print(response.data);
     return response;
   }
 
@@ -197,6 +198,7 @@ class DioServices {
                   )
                 : Options(),
             data: postBody);
+    print("return");
     return response;
   }
 
@@ -207,21 +209,32 @@ class DioServices {
     var postBody = jsonEncode({
       'reference': reference,
     });
-    debugPrint(postBody);
-    final response =
-        await dioNetWorkServices.post("/api/v1/account/bvn_consent",
-            options: token != null
-                ? Options(
-                    headers: {
-                      'Content-Type': 'application/json',
-                      'Accept': 'application/json',
-                      "authorization": "Bearer ${token}",
-                    },
-                  )
-                : Options(),
-            data: postBody);
+    //debugPrint("reference$reference");
+    //debugPrint("postbody$postBody");
+      final response =
+      await dioNetWorkServices.post("/api/v1/account/bvn_consent",
+           options: token != null
+              ? Options(
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json',
+              "authorization": "Bearer ${token}",
+            },
+          )
+              : Options(),
+          data: postBody);
+
+    /*/print(response);
+    response.data.forEach((key, value){
+      print('$key: $value');
+    });
+    print(response.runtimeType);
+    print("========================");*/
+
     return response;
   }
+
+
 
   Future<Response> sendPasswordResetCode(
       {required String resetPasswordPhoneNumber}) async {
@@ -242,7 +255,33 @@ class DioServices {
     return response;
   }
 
-  Future<Response> resendLoginOtp({required String phoneNumber}) async {
+  Future<Map<String, dynamic>> checkTransactionStatus(
+      String transactionId) async {
+    final dio = Dio();
+
+    try {
+      final response = await dio.get(
+        'https://phincash.cloud/api/v1/check-transaction-status/$transactionId',
+        options: Options(headers: {
+          'Content-Type': 'application/json',
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        return response.data;
+      } else {
+        // Handle error response here
+        print('Failed to verify transaction');
+        return {}; // You can return an empty map or throw an exception as needed
+      }
+    } catch (e) {
+      // Handle Dio errors or network exceptions here
+      print('Error: $e');
+      return {}; // You can return an empty map or throw an exception as needed
+    }
+  }
+
+      Future<Response> resendLoginOtp({required String phoneNumber}) async {
     var postBody = jsonEncode({
       'phone_number': phoneNumber,
     });
@@ -270,19 +309,24 @@ class DioServices {
   }
 
   Future<Response> saveCardDetails(
-      {required String cardNumber,
+      {
+  /*required String cardNumber,
       required String cvv,
       required String expiryMonth,
-      required String expiryYear,
+      required String expiryYear,*/
       String? bvn}) async {
     var postBody = jsonEncode({
-      'card_number': cardNumber,
+      /*'cardNo': cardNumber,
       'cvv': cvv,
       'expiry_month': expiryMonth,
-      'expiry_year': expiryYear
+      'expiry_year': expiryYear,*/
+      'amount': 100
     });
+    print("PostBody:");
+    print(postBody);
     final response =
         await dioNetWorkServices.post("/api/v1/add-cards", data: postBody);
+        print("addcard response - $response");
     return response;
   }
 
@@ -321,6 +365,7 @@ class DioServices {
     });
     final response = await dioNetWorkServices
         .post("/api/v1/verify-my-bank-account", data: postBody);
+    print(response.data);
     return AccountVerifyModel.fromJson(response.data);
   }
 
@@ -345,7 +390,7 @@ class DioServices {
 
   Future<Response> deletedBankAccount({required String? bankId}) async {
     final response = await dioNetWorkServices
-        .delete("https://phincash.herokuapp.com/api/v1/bank-accounts/$bankId");
+        .delete("/api/v1/bank-accounts/$bankId");
     return response;
   }
 

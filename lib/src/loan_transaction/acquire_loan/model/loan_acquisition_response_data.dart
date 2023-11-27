@@ -48,7 +48,7 @@ class Data {
   String? status;
   int? loanPackageId;
   DateTime? dueDate;
-  int? userId;
+  int? userId; // Change the type to int
   DateTime? updatedAt;
   DateTime? createdAt;
   int? id;
@@ -58,7 +58,8 @@ class Data {
     status: json["status"] == null ? null : json["status"],
     loanPackageId: json["loan_package_id"] == null ? null : json["loan_package_id"],
     dueDate: json["due_date"] == null ? null : DateTime.parse(json["due_date"]),
-    userId: json["user_id"] == null ? null : json["user_id"],
+    userId: json["user_id"] == null ? null : int.tryParse(json["user_id"] ?? ""),
+    // Use int.tryParse to handle parsing a string to int, provide a default value of "" if it's null
     updatedAt: json["updated_at"] == null ? null : DateTime.parse(json["updated_at"]),
     createdAt: json["created_at"] == null ? null : DateTime.parse(json["created_at"]),
     id: json["id"] == null ? null : json["id"],
@@ -75,3 +76,4 @@ class Data {
     "id": id == null ? null : id,
   };
 }
+

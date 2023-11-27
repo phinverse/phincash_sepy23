@@ -3,8 +3,6 @@ import 'package:get/get.dart';
 import 'package:phincash/src/auth/registration/controller/registration_controller.dart';
 import 'package:phincash/widget/button_widget.dart';
 import 'package:phincash/widget/formfield_widget.dart';
-import '../../../../constants/app_string.dart';
-import '../../../../constants/colors.dart';
 import '../../../../constants/constants.dart';
 import '../../../../widget/bottom_sheet.dart';
 import 'bvn.dart';

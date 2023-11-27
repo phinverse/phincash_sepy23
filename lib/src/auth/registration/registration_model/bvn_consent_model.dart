@@ -1,3 +1,4 @@
+
 import 'dart:convert';
 
 BvnConsent bvnConsentFromJson(String str) =>
@@ -5,188 +6,185 @@ BvnConsent bvnConsentFromJson(String str) =>
 
 String bvnConsentToJson(BvnConsent data) => json.encode(data.toJson());
 class BvnConsent {
+  String status;
+  String message;
+  Data data;
+
   BvnConsent({
     required this.status,
     required this.message,
     required this.data,
   });
-  late final String status;
-  late final String message;
-  late final Data data;
 
-  BvnConsent.fromJson(Map<String, dynamic> json){
-    status = json['status'];
-    message = json['message'];
-    data = Data.fromJson(json['data']);
-  }
+  factory BvnConsent.fromJson(Map<String, dynamic> json) => BvnConsent(
+    status: json["status"],
+    message: json["message"],
+    data: Data.fromJson(json["data"]),
+  );
 
-  Map<String, dynamic> toJson() {
-    final _data = <String, dynamic>{};
-    _data['status'] = status;
-    _data['message'] = message;
-    _data['data'] = data.toJson();
-    return _data;
-  }
+  Map<String, dynamic> toJson() => {
+    "status": status,
+    "message": message,
+    "data": data.toJson(),
+  };
 }
 
 class Data {
+  String firstName;
+  String lastName;
+  String status;
+  String reference;
+  dynamic callbackUrl;
+  BvnData bvnData;
+  DateTime createdAt;
+
   Data({
     required this.firstName,
     required this.lastName,
     required this.status,
     required this.reference,
-     this.callbackUrl,
+    required this.callbackUrl,
     required this.bvnData,
     required this.createdAt,
   });
-  late final String firstName;
-  late final String lastName;
-  late final String status;
-  late final String reference;
-  late final dynamic callbackUrl;
-  late final BvnData bvnData;
-  late final String createdAt;
-  
-  Data.fromJson(Map<String, dynamic> json){
-    firstName = json['first_name'];
-    lastName = json['last_name'];
-    status = json['status'];
-    reference = json['reference'];
-    callbackUrl = dynamic;
-    bvnData = BvnData.fromJson(json['bvn_data']);
-    createdAt = json['created_at'];
-  }
 
-  Map<String, dynamic> toJson() {
-    final _data = <String, dynamic>{};
-    _data['first_name'] = firstName;
-    _data['last_name'] = lastName;
-    _data['status'] = status;
-    _data['reference'] = reference;
-    _data['callback_url'] = callbackUrl;
-    _data['bvn_data'] = bvnData.toJson();
-    _data['created_at'] = createdAt;
-    return _data;
-  }
+  factory Data.fromJson(Map<String, dynamic> json) => Data(
+    firstName: json["first_name"],
+    lastName: json["last_name"],
+    status: json["status"],
+    reference: json["reference"],
+    callbackUrl: json["callback_url"],
+    bvnData: BvnData.fromJson(json["bvn_data"]),
+    createdAt: DateTime.parse(json["created_at"]),
+  );
+
+  Map<String, dynamic> toJson() => {
+    "first_name": firstName,
+    "last_name": lastName,
+    "status": status,
+    "reference": reference,
+    "callback_url": callbackUrl,
+    "bvn_data": bvnData.toJson(),
+    "created_at": createdAt.toIso8601String(),
+  };
 }
 
 class BvnData {
+  String nin;
+  String email;
+  String gender;
+  String surname;
+  dynamic serialNo;
+  String faceImage;
+  String firstName;
+  dynamic landmarks;
+  dynamic branchName;
+  String middleName;
+  dynamic nameOnCard;
+  String dateOfBirth;
+  String lgaOfOrigin;
+  String watchlisted;
+  dynamic lgaOfCapture;
+  String phoneNumber1;
+  dynamic phoneNumber2;
+  String maritalStatus;
+  String stateOfOrigin;
+  dynamic enrollBankCode;
+  String enrollUserName;
+  dynamic enrollmentDate;
+  String lgaOfResidence;
+  String stateOfCapture;
+  dynamic additionalInfo1;
+  String productReference;
+  String stateOfResidence;
+
   BvnData({
-     this.nin,
-     this.email,
+    required this.nin,
+    required this.email,
     required this.gender,
     required this.surname,
-     this.serialNo,
+    required this.serialNo,
     required this.faceImage,
     required this.firstName,
-     this.landmarks,
-     this.branchName,
+    required this.landmarks,
+    required this.branchName,
     required this.middleName,
-     this.nameOnCard,
+    required this.nameOnCard,
     required this.dateOfBirth,
     required this.lgaOfOrigin,
     required this.watchlisted,
-     this.lgaOfCapture,
+    required this.lgaOfCapture,
     required this.phoneNumber1,
     required this.phoneNumber2,
     required this.maritalStatus,
     required this.stateOfOrigin,
-     this.enrollBankCode,
+    required this.enrollBankCode,
     required this.enrollUserName,
-     this.enrollmentDate,
+    required this.enrollmentDate,
     required this.lgaOfResidence,
     required this.stateOfCapture,
-     this.additionalInfo1,
+    required this.additionalInfo1,
     required this.productReference,
     required this.stateOfResidence,
   });
-  late final dynamic nin;
-  late final dynamic email;
-  late final String gender;
-  late final String surname;
-  late final dynamic serialNo;
-  late final String faceImage;
-  late final String firstName;
-  late final dynamic landmarks;
-  late final dynamic branchName;
-  late final String middleName;
-  late final dynamic nameOnCard;
-  late final String dateOfBirth;
-  late final String lgaOfOrigin;
-  late final String watchlisted;
-  late final dynamic lgaOfCapture;
-  late final String phoneNumber1;
-  late final String phoneNumber2;
-  late final String maritalStatus;
-  late final String stateOfOrigin;
-  late final dynamic enrollBankCode;
-  late final String enrollUserName;
-  late final dynamic enrollmentDate;
-  late final String lgaOfResidence;
-  late final String stateOfCapture;
-  late final dynamic additionalInfo1;
-  late final String productReference;
-  late final String stateOfResidence;
 
-  BvnData.fromJson(Map<String, dynamic> json){
-    nin = json['nin'];
-    email = json['email'];
-    gender = json['gender'];
-    surname = json['surname'];
-    serialNo = json['serialNo'];
-    faceImage = json['faceImage'];
-    firstName = json['firstName'];
-    landmarks = json['landmarks'];;
-    branchName = json['branchName'];
-    middleName = json['middleName'];
-    nameOnCard = json['nameOnCard'];
-    dateOfBirth = json['dateOfBirth'];
-    lgaOfOrigin = json['lgaOfOrigin'];
-    watchlisted = json['watchlisted'];
-    lgaOfCapture = json['lgaOfCapture'];
-    phoneNumber1 = json['phoneNumber1'];
-    phoneNumber2 = json['phoneNumber2'];
-    maritalStatus = json['maritalStatus'];
-    stateOfOrigin = json['stateOfOrigin'];
-    enrollBankCode = json['enrolBankCode'];
-    enrollUserName = json['enrollUserName'];
-    enrollmentDate = json['enrollmentDate'];
-    lgaOfResidence = json['lgaOfResidence'];
-    stateOfCapture = json['stateOfCapture'];
-    additionalInfo1 = json['additionalInfo1'];
-    productReference = json['productReference'];
-    stateOfResidence = json['stateOfResidence'];
-  }
+  factory BvnData.fromJson(Map<String, dynamic> json) => BvnData(
+    nin: json["nin"],
+    email: json["email"],
+    gender: json["gender"],
+    surname: json["surname"],
+    serialNo: json["serialNo"],
+    faceImage: json["faceImage"],
+    firstName: json["firstName"],
+    landmarks: json["landmarks"],
+    branchName: json["branchName"],
+    middleName: json["middleName"],
+    nameOnCard: json["nameOnCard"],
+    dateOfBirth: json["dateOfBirth"],
+    lgaOfOrigin: json["lgaOfOrigin"],
+    watchlisted: json["watchlisted"],
+    lgaOfCapture: json["lgaOfCapture"],
+    phoneNumber1: json["phoneNumber1"],
+    phoneNumber2: json["phoneNumber2"],
+    maritalStatus: json["maritalStatus"],
+    stateOfOrigin: json["stateOfOrigin"],
+    enrollBankCode: json["enrollBankCode"],
+    enrollUserName: json["enrollUserName"],
+    enrollmentDate: json["enrollmentDate"],
+    lgaOfResidence: json["lgaOfResidence"],
+    stateOfCapture: json["stateOfCapture"],
+    additionalInfo1: json["additionalInfo1"],
+    productReference: json["productReference"],
+    stateOfResidence: json["stateOfResidence"],
+  );
 
-  Map<String, dynamic> toJson() {
-    final _data = <String, dynamic>{};
-    _data['nin'] = nin;
-    _data['email'] = email;
-    _data['gender'] = gender;
-    _data['surname'] = surname;
-    _data['serialNo'] = serialNo;
-    _data['faceImage'] = faceImage;
-    _data['firstName'] = firstName;
-    _data['landmarks'] = landmarks;
-    _data['branchName'] = branchName;
-    _data['middleName'] = middleName;
-    _data['nameOnCard'] = nameOnCard;
-    _data['dateOfBirth'] = dateOfBirth;
-    _data['lgaOfOrigin'] = lgaOfOrigin;
-    _data['watchlisted'] = watchlisted;
-    _data['lgaOfCapture'] = lgaOfCapture;
-    _data['phoneNumber1'] = phoneNumber1;
-    _data['phoneNumber2'] = phoneNumber2;
-    _data['maritalStatus'] = maritalStatus;
-    _data['stateOfOrigin'] = stateOfOrigin;
-    _data['enrollBankCode'] = enrollBankCode;
-    _data['enrollUserName'] = enrollUserName;
-    _data['enrollmentDate'] = enrollmentDate;
-    _data['lgaOfResidence'] = lgaOfResidence;
-    _data['stateOfCapture'] = stateOfCapture;
-    _data['additionalInfo1'] = additionalInfo1;
-    _data['productReference'] = productReference;
-    _data['stateOfResidence'] = stateOfResidence;
-    return _data;
-  }
+  Map<String, dynamic> toJson() => {
+    "nin": nin,
+    "email": email,
+    "gender": gender,
+    "surname": surname,
+    "serialNo": serialNo,
+    "faceImage": faceImage,
+    "firstName": firstName,
+    "landmarks": landmarks,
+    "branchName": branchName,
+    "middleName": middleName,
+    "nameOnCard": nameOnCard,
+    "dateOfBirth": dateOfBirth,
+    "lgaOfOrigin": lgaOfOrigin,
+    "watchlisted": watchlisted,
+    "lgaOfCapture": lgaOfCapture,
+    "phoneNumber1": phoneNumber1,
+    "phoneNumber2": phoneNumber2,
+    "maritalStatus": maritalStatus,
+    "stateOfOrigin": stateOfOrigin,
+    "enrollBankCode": enrollBankCode,
+    "enrollUserName": enrollUserName,
+    "enrollmentDate": enrollmentDate,
+    "lgaOfResidence": lgaOfResidence,
+    "stateOfCapture": stateOfCapture,
+    "additionalInfo1": additionalInfo1,
+    "productReference": productReference,
+    "stateOfResidence": stateOfResidence,
+  };
 }

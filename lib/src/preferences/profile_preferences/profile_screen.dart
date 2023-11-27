@@ -3,7 +3,6 @@ import 'package:get/get.dart';
 import 'package:phincash/src/loan_transaction/transactions/controller/transaction_controller.dart';
 import 'package:phincash/src/preferences/widget/setting_option_tile.dart';
 import '../../../constants/app_string.dart';
-import 'package:dio/dio.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({Key? key}) : super(key: key);
@@ -13,7 +12,7 @@ class ProfileScreen extends StatelessWidget {
     final _controller = Get.put(TransactionController());
     String imageUrl = "${_controller.userPersonalData!.user.userPhoto}"
         .replaceFirst('public/', '');
-    String baseUrl = 'https://phincash.yutechexpress.com/storage/';
+    String baseUrl = 'https://phincash.cloud/storage/app/public/';
     return SafeArea(
         top: false,
         bottom: false,

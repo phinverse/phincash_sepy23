@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:adv_camera/adv_camera.dart';
+import 'package:liveness_cam/liveness_cam.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -16,6 +17,11 @@ class CameraApp extends StatefulWidget {
 }
 
 class _CameraAppState extends State<CameraApp> {
+  //add new line
+  final _livenessCam = LivenessCam();
+
+  File? result;
+
   List<String> pictureSizes = <String>[];
   String? imagePath;
   var _controller = Get.put(RegistrationController());
@@ -32,119 +38,34 @@ class _CameraAppState extends State<CameraApp> {
       appBar: AppBar(
         title: const Text('Take a Selfie'),
       ),
-      body: SafeArea(
-        child: Stack(
+      body: Center(
+        child: Column(
           children: [
-            Column(
-              children: [
-                Padding(
-                  padding: EdgeInsets.symmetric(vertical: 16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // buildFlashSettings(context),
-                      // Container(
-                      //   margin: EdgeInsets.symmetric(
-                      //     horizontal: 16,
-                      //   ).copyWith(bottom: 16),
-                      //   height: 1,
-                      //   width: double.infinity,
-                      //   color: Colors.grey,
-                      // ),
-                      // buildRatioSettings(context),
-                      // if (this.pictureSizes.isNotEmpty)
-                      //   Container(
-                      //     margin: EdgeInsets.symmetric(
-                      //       horizontal: 16,
-                      //     ).copyWith(bottom: 16),
-                      //     height: 1,
-                      //     width: double.infinity,
-                      //     color: Colors.grey,
-                      //   ),
-                      // if (this.pictureSizes.isNotEmpty)
-                      //   buildImageOutputSettings(context),
-                    ],
-                  ),
-                ),
-                Expanded(
-                  child: AdvCamera(
-                    initialCameraType: CameraType.rear,
-                    onCameraCreated: _onCameraCreated,
-                    onImageCaptured: (String path) {
-                      print('Image successfully captured and saved at $path');
-                      if (this.mounted)
-                        setState(() {
-                          imagePath = path;
-                        });
-                      _controller.uploadImage(File(path));
-                    },
-                    cameraPreviewRatio: CameraPreviewRatio.r16_9,
-                    focusRectColor: Colors.purple,
-                    focusRectSize: 200,
-                  ),
-                ),
-              ],
+            result != null ? Image.file(result!) : Container(),
+            const SizedBox(
+              height: 20,
             ),
-            Positioned(
-              bottom: 16.0,
-              left: 16.0,
-              child: imagePath != null
-                  ? Container(
-                      width: 100.0,
-                      height: 100.0,
-                      child: Image.file(File(imagePath!)),
-                    )
-                  : Icon(Icons.image),
-            )
+            Builder(builder: (context) {
+              return ElevatedButton(
+                  onPressed: () {
+                    _livenessCam.start(context).then((value) {
+                      if (value != null) {
+                        setState(() {
+                          result = value;
+                          _controller.uploadImage(value);
+                        });
+                      }
+                    });
+                  },
+                  child: const Text(
+                    "Start",
+                    style: TextStyle(fontSize: 19),
+                  ));
+            })
           ],
         ),
       ),
-      floatingActionButton: Column(
-        crossAxisAlignment: CrossAxisAlignment.end,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // FloatingActionButton(
-          //   heroTag: "GoToNextPage",
-          //   child: Icon(Icons.navigate_next),
-          //   onPressed: () async {
-          //     await cameraController!.turnOffCamera();
-          //     await Navigator.push(
-          //       context,
-          //       MaterialPageRoute(
-          //         builder: (BuildContext context) {
-          //           return Scaffold(
-          //             appBar: AppBar(title: Text("Next Page")),
-          //             body: Center(
-          //               child: Text(
-          //                 "You can use the flashlight here because even though the camera is still running in the background, I turned it off",
-          //                 textAlign: TextAlign.center,
-          //               ),
-          //             ),
-          //           );
-          //         },
-          //       ),
-          //     );
-          //     await cameraController!.turnOnCamera();
-          //   },
-          // ),
-          Container(height: 16.0),
-          FloatingActionButton(
-            heroTag: "switch",
-            child: Icon(Icons.switch_camera),
-            onPressed: () async {
-              await cameraController!.switchCamera();
-            },
-          ),
-          Container(height: 16.0),
-          FloatingActionButton(
-            heroTag: "capture",
-            child: Icon(Icons.camera),
-            onPressed: () {
-              cameraController!.captureImage(maxSize: 256);
-            },
-          ),
-        ],
-      ),
+
     );
   }
 

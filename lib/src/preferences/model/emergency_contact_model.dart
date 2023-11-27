@@ -58,7 +58,7 @@ class EmergencyContacts {
     email: json["email"] == null ? null : json["email"],
     relationship: json["relationship"] == null ? null : json["relationship"],
     contactAddress: json["contact_address"] == null ? null : json["contact_address"],
-    userId: json["user_id"] == null ? null : json["user_id"],
+    userId: json["user_id"] == null ? null : int.tryParse(json["user_id"] ?? ""),
     createdAt: json["created_at"] == null ? null : DateTime.parse(json["created_at"]),
     updatedAt: json["updated_at"] == null ? null : DateTime.parse(json["updated_at"]),
   );

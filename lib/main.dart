@@ -6,7 +6,7 @@ import 'package:phincash/splash_screen.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:phincash/src/information/views/privacy_policy/controller/policy_and_privacy_controller.dart';
-import 'package:phincash/watermark.dart';
+// import 'package:phincash/watermark.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

@@ -22,6 +22,7 @@ class FormFieldWidget extends StatelessWidget {
   final Widget? prefixIcon;
   final EdgeInsetsGeometry? padding;
   final bool? readOnly;
+  final void Function()? onPressed;
   const FormFieldWidget(
       {Key? key,
       this.labelText,
@@ -42,7 +43,8 @@ class FormFieldWidget extends StatelessWidget {
       this.prefixIcon,
       this.padding,
       this.readOnly,
-      this.enabled})
+      this.enabled,
+      this.onPressed,})
       : super(key: key);
 
   @override

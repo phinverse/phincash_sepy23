@@ -58,14 +58,15 @@ class LoanPackages {
   factory LoanPackages.fromJson(Map<String, dynamic> json) => LoanPackages(
     id: json["id"],
     name: json["name"],
-    amount: json["amount"],
-    duration: json["duration"],
+    amount: json["amount"] is int ? json["amount"] : int.tryParse(json["amount"].toString()) ?? 0,
+    duration: json["duration"] is int ? json["duration"] : int.tryParse(json["duration"].toString()) ?? 0,
     interestRate: json["interest_rate"],
     overdueInterestRate: json["overdue_interest_rate"].toDouble(),
     status: json["status"],
     createdAt: json["created_at"] == null ? null : DateTime.parse(json["created_at"]),
     updatedAt: json["updated_at"] == null ? null : DateTime.parse(json["updated_at"]),
   );
+
 
   Map<String, dynamic> toJson() => {
     "id": id,

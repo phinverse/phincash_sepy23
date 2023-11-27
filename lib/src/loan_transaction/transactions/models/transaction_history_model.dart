@@ -52,9 +52,9 @@ class TransactionHistoryList {
   String? description;
   String? type;
   String? status;
-  int? amount;
+  String? amount;
   dynamic payload;
-  int? userId;
+  String?  userId;
   DateTime? completedAt;
   DateTime? createdAt;
   DateTime? updatedAt;
